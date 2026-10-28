@@ -1,0 +1,155 @@
+/* style.css: all visuals ("Graphite": near-black neutral background, flat panels, ONE pastel lilac accent).
+   Sections: tokens, setup, reader bars, text + highlight, markdown, search hits, floating bits, chapters.
+   Lilac = cursor, active rail, "on" states. Rose = search hits. Mint = the "listening" dot only. */
+:root{color-scheme:dark;--bg:#0b0b0d;--fg:#ececf1;--dim:#74747e;--hd:#b9b9c4;--acc:#d6c6f5;--accfg:#231a38;--bar:rgba(190,165,235,.75);--live:#a9e3cc;
+--card:#16161a;--card2:#1f1f25;--line:#2a2a31;--hit:#e9a9cb;--fs:30px;--bh:60px;--fh:88px;
+--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px)}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{height:100%;margin:0;overflow:hidden}
+body{background:var(--bg);color:var(--fg);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+svg.i{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+[hidden]{display:none!important}
+.aurora{display:none}
+
+/* ===== setup screen ===== */
+#setup{height:100%;display:flex;flex-direction:column;gap:12px;max-width:760px;margin:0 auto;
+  padding:calc(16px + var(--sat)) calc(16px + var(--sar)) calc(16px + var(--sab)) calc(16px + var(--sal))}
+#setup.drag textarea{border-color:var(--acc);box-shadow:0 0 0 3px rgba(214,198,245,.18)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{width:40px;height:40px;border-radius:12px}
+h1{margin:0;font-size:22px;letter-spacing:.2px}
+.hint{color:var(--dim);font-size:14px;margin:0;line-height:1.4}
+textarea{flex:1;min-height:0;width:100%;resize:none;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:16px;padding:14px;font:inherit;font-size:16px;line-height:1.5;outline:none}
+textarea:focus,select:focus,#sq:focus{border-color:#41414c}
+select,button,input{font:inherit;color:var(--fg)}
+select{min-height:52px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0 12px;font-size:16px;outline:none;flex:1;min-width:0}
+.row{display:flex;gap:10px;align-items:center}
+.row .hint{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+button{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:16px;min-height:52px;min-width:52px;padding:0 14px;font-size:16px;font-weight:600;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:background .15s,transform .08s}
+button:active{transform:scale(.96);background:var(--card2)}
+button.primary{background:var(--acc);color:var(--accfg);border-color:transparent;font-weight:700;flex:1}
+button[aria-pressed="true"]{background:var(--acc);color:var(--accfg);border-color:transparent}
+
+/* ===== reader: bars ===== */
+#reader{display:none;position:fixed;inset:0;z-index:20;background:var(--bg)}
+.glass{position:absolute;left:0;right:0;z-index:10;display:flex;flex-direction:column;align-items:stretch;gap:4px;background:rgba(11,11,13,.86);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2)}
+.brow{display:flex;gap:6px;align-items:center}
+#bar{top:0;padding:calc(8px + var(--sat)) calc(10px + var(--sar)) 8px calc(10px + var(--sal));border-bottom:1px solid rgba(255,255,255,.07)}
+#foot{bottom:0;padding:6px calc(10px + var(--sar)) calc(10px + var(--sab)) calc(10px + var(--sal));border-top:1px solid rgba(255,255,255,.07)}
+.ghost{background:transparent;border-color:transparent;padding:0}
+.ghost:active{background:var(--card)}
+#status{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;color:var(--dim)}
+#status span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#dot{width:8px;height:8px;border-radius:50%;background:var(--dim);flex:none;opacity:.5}
+#reader.live #dot{background:var(--live);opacity:1;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(169,227,204,.45)}50%{box-shadow:0 0 0 6px rgba(169,227,204,0)}}
+.frow{display:flex;gap:8px;align-items:center}
+.frow button{flex:1;padding:0 8px;font-size:15px}
+.frow #mic{flex:1.5}
+.frow .pg{flex-direction:column;gap:2px;padding:4px 6px;color:#cfcfd8}
+.frow .pg small{font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--dim);white-space:nowrap}
+#mic.on{background:var(--acc);color:var(--accfg);border-color:transparent}
+#mic .lbl{display:inline}
+#mic .slash{display:inline}
+#mic.on .slash{display:none}
+
+/* chapter row (only when the text has headings): quiet, low contrast */
+#chap{display:none;align-items:center;gap:4px}
+#reader.hasch #chap{display:flex}
+#chap button{min-height:40px;min-width:48px;border-radius:12px;color:var(--dim);font-size:13px;font-weight:600}
+#chap button svg.i{width:20px;height:20px}
+#ctitle{flex:1;min-width:0;gap:8px}
+#ctitle span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#a9a9b5}
+#ctitle small{flex:none;font-size:11px;opacity:.8}
+
+/* search row inside the top bar */
+#sbar{display:none}
+#reader.searching #sbar{display:flex}
+#sq{flex:1;min-width:0;height:46px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0 12px;font-size:16px;outline:none}
+#sq::placeholder{color:var(--dim)}
+#scount{min-width:46px;text-align:center;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
+#sbar button{min-width:44px;min-height:46px;padding:0}
+
+/* ===== text + highlight ===== */
+#text{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;touch-action:pan-y;isolation:isolate;
+  padding:35vh calc(20px + var(--sar)) 65vh calc(14px + var(--sal));font-size:var(--fs);line-height:1.42;letter-spacing:.005em;overflow-wrap:anywhere;word-break:normal}
+/* every reading unit (paragraph, heading, list item...) is a .blk; the active one is bright with a bar on the left */
+#text .blk{position:relative;margin:0 0 1em;padding-left:14px;border-left:4px solid transparent;border-radius:2px;color:var(--dim);transition:color .25s,border-color .25s}
+#text .blk.act{color:var(--fg);border-left-color:var(--bar)}
+/* the current sentence is drawn as one rounded shape behind the text (z-index 0; backgrounds of blocks sit at -1) */
+#hl{position:absolute;left:0;top:0;width:1px;height:1px;overflow:visible;pointer-events:none;z-index:0}
+#hl path{fill:rgba(255,255,255,.055);stroke:rgba(255,255,255,.11);stroke-width:1}
+.w{cursor:pointer}
+/* "Bold" via text-stroke so the highlighted word never changes width and the line never reflows */
+.w.cur .t{background:var(--acc);color:var(--accfg);-webkit-text-stroke:.025em var(--accfg);border-radius:.2em;box-shadow:0 0 0 .1em var(--acc),0 0 .6em rgba(214,198,245,.22)}
+
+/* ===== markdown ===== */
+#text h1.blk,#text h2.blk,#text h3.blk,#text h4.blk,#text h5.blk,#text h6.blk{color:var(--hd);font-weight:750;line-height:1.2;letter-spacing:-.01em}
+#text .blk.h.act{color:var(--fg)}
+#text h1.blk{font-size:1.5em;font-weight:800;margin:1.1em 0 .7em}
+#text h1.blk::after{content:"";display:block;height:1px;margin-top:.45em;background:linear-gradient(90deg,var(--line),transparent)}
+#text h2.blk{font-size:1.28em;margin:1.5em 0 .6em}
+#text h3.blk{font-size:1.14em;margin:1.3em 0 .5em}
+#text h4.blk,#text h5.blk,#text h6.blk{font-size:.9em;text-transform:uppercase;letter-spacing:.07em;margin:1.2em 0 .5em}
+#text hr{border:0;height:1px;margin:1.6em 14px;background:linear-gradient(90deg,transparent,var(--line),transparent)}
+.fb{font-weight:700}
+.fi{font-style:italic}
+.fs{text-decoration:line-through;text-decoration-color:rgba(255,255,255,.35)}
+.fa{text-decoration:underline;text-decoration-color:rgba(214,198,245,.6);text-underline-offset:.16em;text-decoration-thickness:.06em}
+.fc{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86em;background:rgba(255,255,255,.08);border-radius:.3em;padding:.04em .3em}
+#text .blk:not(.act) .fb{color:#a3a3af}
+.w.cur .t .fc{background:none;padding:0}
+/* lists */
+#text .li{padding-left:calc(14px + (var(--lv,0) * 1.3em) + 1.35em);margin-bottom:.45em}
+#text .li::before{content:attr(data-m);position:absolute;left:calc(14px + var(--lv,0) * 1.3em);top:0;color:var(--acc);opacity:.8;font-weight:700;min-width:1.2em}
+#text .li.task::before{content:"\2610";font-size:1.05em}
+#text .li.task.done::before{content:"\2611";color:var(--acc)}
+#text .li.done:not(.act){text-decoration:line-through;text-decoration-color:rgba(255,255,255,.25)}
+/* quotes: tinted panel + italic */
+#text .blk.q{font-style:italic;padding-left:calc(14px + 1.1em)}
+#text .blk.q::before{content:"";position:absolute;inset:-.25em 0 -.25em 0;z-index:-1;border-radius:0 14px 14px 0;background:linear-gradient(90deg,rgba(214,198,245,.075),rgba(214,198,245,.015))}
+/* code */
+#text pre.blk{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.76em;line-height:1.5;padding-top:.7em;padding-bottom:.7em}
+#text pre.blk::before{content:"";position:absolute;inset:0 0 0 0;z-index:-1;border-radius:14px;background:var(--card)}
+/* tables */
+#text .tbl table{width:100%;border-collapse:collapse;font-size:.82em;line-height:1.35}
+#text .tbl th,#text .tbl td{text-align:left;vertical-align:top;padding:.45em .6em;border-bottom:1px solid var(--line)}
+#text .tbl tr:last-child td{border-bottom:0}
+#text .tbl th{color:var(--hd);font-weight:700;font-size:.9em;letter-spacing:.03em}
+#text .tbl::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:14px;background:rgba(255,255,255,.035)}
+
+/* ===== search hits ===== */
+.w.hit .t{color:var(--fg);background:rgba(233,169,203,.16);border-radius:.15em;box-shadow:0 2px 0 0 rgba(233,169,203,.75)}
+.w.hit.sel .t{background:rgba(233,169,203,.34);box-shadow:0 2px 0 0 var(--hit)}
+.w.cur .t{color:var(--accfg)}
+.w.hit.cur .t{background:var(--acc);box-shadow:0 0 0 .1em var(--acc),0 0 .6em rgba(214,198,245,.22),0 .16em 0 .1em var(--hit)}
+
+/* ===== floating bits ===== */
+#back{display:none;position:absolute;right:calc(14px + var(--sar));bottom:calc(var(--fh) + 12px);z-index:11;background:var(--acc);color:var(--accfg);font-weight:700;border:0;border-radius:999px;padding:0 18px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+#back.show{display:inline-flex}
+#toast{position:absolute;left:50%;top:calc(var(--bh) + 10px);transform:translateX(-50%);z-index:12;background:var(--card2);border:1px solid var(--line);color:var(--fg);font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1}
+
+/* ===== chapter list sheet ===== */
+#outline{display:none;position:absolute;inset:0;z-index:15;background:rgba(0,0,0,.6)}
+#outline.show{display:block}
+#osheet{position:absolute;left:calc(8px + var(--sal));right:calc(8px + var(--sar));bottom:calc(var(--fh) + 8px);max-height:62%;overflow-y:auto;overscroll-behavior:contain;background:rgba(24,24,29,.97);border:1px solid var(--line);border-radius:20px;padding:8px;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+#osheet button{display:flex;width:100%;justify-content:flex-start;text-align:left;border-color:transparent;background:transparent;min-height:48px;padding:6px 12px 6px calc(12px + var(--l,0) * 16px);font-size:16px;font-weight:600;color:#cfcfd8;border-radius:12px}
+#osheet button.sub{font-size:14px;font-weight:500;color:var(--dim)}
+#osheet button.now{background:var(--acc);color:var(--accfg)}
+#osheet button span{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+
+/* ===== heading toggle + pinned chapter title ===== */
+#hbtn{display:none}
+#reader.hasch #hbtn{display:inline-flex}
+.ghost[aria-pressed="true"]{background:var(--acc);color:var(--accfg)}
+#pin{display:none;align-items:baseline;gap:8px;width:100%;min-height:34px;margin:0;padding:0 12px 4px;border:0;border-radius:14px;background:transparent;text-align:left;justify-content:flex-start;font-size:15px}
+#pin:active{background:var(--card);transform:none}
+#reader.hasch #pin:not(.empty){display:flex}
+#pin span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ppar{flex:0 1 auto;max-width:38%;color:var(--dim);font-size:13px;font-weight:500}
+#ppar:not(:empty)::after{content:" \203A";}
+#pcur{flex:1 1 auto;min-width:0;color:var(--fg);font-weight:700}
+#pin.swap span{animation:pinin .22s ease-out}
+@keyframes pinin{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}

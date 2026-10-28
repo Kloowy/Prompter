@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Prompter</title>
+<meta name="theme-color" content="#0c0c0f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+  <symbol id="i-aminus" viewBox="0 0 24 24"><path d="M3 18 8 6l5 12"/><path d="M4.8 14h6.4"/><path d="M16 12h6"/></symbol>
+  <symbol id="i-aplus" viewBox="0 0 24 24"><path d="M2 20 8 4l6 16"/><path d="M4.2 15h7.6"/><path d="M16 12h6"/><path d="M19 9v6"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 24 24"><path d="M5 20V5"/><path d="m1.5 8.5 3.5-3.5 3.5 3.5"/><path d="M12 6h9"/><path d="M12 12h9"/><path d="M12 18h6"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M5 4v15"/><path d="m1.5 15.5 3.5 3.5 3.5-3.5"/><path d="M12 6h9"/><path d="M12 12h9"/><path d="M12 18h6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="i-cprev" viewBox="0 0 24 24"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/></symbol>
+  <symbol id="i-cnext" viewBox="0 0 24 24"><path d="m6 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/></symbol>
+  <symbol id="i-head" viewBox="0 0 24 24"><path d="M4 5v14"/><path d="M14 5v14"/><path d="M4 12h10"/><path d="M18 9.5a4 4 0 0 1 0 5"/><path d="M20.5 7a7.5 7.5 0 0 1 0 10"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6"/><path d="M9 17h4"/></symbol>
+</svg>
+
+<!-- ===== setup screen ===== -->
+<div id="setup">
+  <div class="brand"><img src="icon-192.png" alt=""><h1>Prompter</h1></div>
+  <p class="hint">Paste your speech or open a Markdown / text file, then press Start. On-device recognition (offline, fast) downloads a ~40 MB model once.</p>
+  <textarea id="src" placeholder="Paste your text here. Separate paragraphs with a line break."></textarea>
+  <div class="row">
+    <button id="file" type="button"><svg class="i"><use href="#i-file"/></svg>Open file</button>
+    <button id="mdt" type="button" aria-pressed="false">Markdown</button>
+    <span id="fname" class="hint"></span>
+  </div>
+  <input type="file" id="fin" accept=".md,.markdown,.mdown,.txt,.text,text/plain,text/markdown" hidden>
+  <div class="row">
+    <select id="eng" aria-label="Recognition engine">
+      <option value="auto">Recognition: auto</option>
+      <option value="local">On-device (offline, fast)</option>
+      <option value="browser">Browser (Google, online)</option>
+    </select>
+  </div>
+  <div class="row">
+    <select id="lang" aria-label="Spoken language">
+      <option value="auto">Auto-detect</option>
+      <option value="en-US">English (US)</option>
+      <option value="en-GB">English (UK)</option>
+      <option value="de-DE">Deutsch</option>
+      <option value="fr-FR">Français</option>
+      <option value="es-ES">Español</option>
+      <option value="it-IT">Italiano</option>
+      <option value="pt-PT">Português</option>
+      <option value="pl-PL">Polski</option>
+      <option value="ro-RO">Română</option>
+      <option value="tr-TR">Türkçe</option>
+      <option value="uk-UA">Українська</option>
+      <option value="ru-RU">Русский</option>
+    </select>
+    <button class="primary" id="go">Start</button>
+  </div>
+</div>
+
+<!-- ===== reader screen ===== -->
+<div id="reader">
+  <div id="text"></div>
+
+  <div id="bar" class="glass">
+    <div class="brow">
+      <button id="edit" class="ghost" aria-label="Edit text"><svg class="i"><use href="#i-edit"/></svg></button>
+      <button id="hbtn" class="ghost" aria-pressed="false" aria-label="Headings are read aloud"><svg class="i"><use href="#i-head"/></svg></button>
+      <div id="status"><i id="dot"></i><span id="stxt">Auto-sync off</span></div>
+      <button id="sbtn" class="ghost" aria-label="Search"><svg class="i"><use href="#i-search"/></svg></button>
+      <button id="fm" class="ghost" aria-label="Smaller text"><svg class="i"><use href="#i-aminus"/></svg></button>
+      <button id="fp" class="ghost" aria-label="Larger text"><svg class="i"><use href="#i-aplus"/></svg></button>
+    </div>
+    <button id="pin" class="empty" aria-label="Chapter list"><span id="ppar"></span><span id="pcur"></span></button>
+    <div id="sbar" class="brow">
+      <input id="sq" type="text" inputmode="search" enterkeyhint="search" placeholder="Find words…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Search text">
+      <span id="scount">0</span>
+      <button id="sprev" class="ghost" aria-label="Previous match"><svg class="i"><use href="#i-up"/></svg></button>
+      <button id="snext" class="ghost" aria-label="Next match"><svg class="i"><use href="#i-down"/></svg></button>
+      <button id="sclose" class="ghost" aria-label="Close search"><svg class="i"><use href="#i-x"/></svg></button>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+  <button id="back"><svg class="i"><use href="#i-down"/></svg>Back to place</button>
+
+  <div id="outline"><div id="osheet"></div></div>
+
+  <div id="foot" class="glass">
+    <div id="chap">
+      <button id="cprev" class="ghost" aria-label="Previous chapter"><svg class="i"><use href="#i-cprev"/></svg></button>
+      <button id="ctitle" class="ghost" aria-label="Chapter list"><span id="ctxt">Chapters</span><small id="cnum"></small></button>
+      <button id="cnext" class="ghost" aria-label="Next chapter"><svg class="i"><use href="#i-cnext"/></svg></button>
+    </div>
+    <div class="frow">
+      <button id="prev" class="pg" aria-label="Previous paragraph"><svg class="i"><use href="#i-prev"/></svg><small>Prev paragraph</small></button>
+      <button id="mic" aria-label="Toggle auto-sync">
+        <svg class="i" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/><path class="slash" d="M3 3l18 18"/></svg><span class="lbl">Auto-sync</span>
+      </button>
+      <button id="next" class="pg" aria-label="Next paragraph"><svg class="i"><use href="#i-next"/></svg><small>Next paragraph</small></button>
+    </div>
+  </div>
+</div>
+
+<script src="js/match.js"></script>
+<script src="js/markdown.js"></script>
+<script src="js/search.js"></script>
+<script src="js/track.js"></script>
+<script src="js/engine-local.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
