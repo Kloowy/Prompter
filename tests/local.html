@@ -1,0 +1,19 @@
+<!doctype html><meta charset="utf-8"><base href="/"><title>local engine test</title>
+<script src="js/match.js"></script><script src="js/engine-local.js"></script>
+<script>
+window.LOG=[];window.T0=0;
+const script=`Good morning everyone. Today I want to talk about three things: the problem, the data, and what we can do. Global temperatures are rising and this is not a debate anymore. Sea levels are rising and coastal cities are at risk. Nobody is ready for what is coming. Thank you very much for listening.`;
+const words=script.toLowerCase().replace(/[^a-z' ]+/g,' ').split(/\s+/).filter(Boolean);
+window.runTest=async(useGrammar,extra)=>{
+  const e=new LocalEngine();window.eng=e;
+  const t0=performance.now();
+  await e.start('en-US',useGrammar?words.concat(extra||[]):[],{
+    onProgress:p=>{},
+    onPartial:t=>LOG.push({t:+((performance.now()-window.T0)/1000).toFixed(2),k:'p',s:t}),
+    onFinal:t=>LOG.push({t:+((performance.now()-window.T0)/1000).toFixed(2),k:'F',s:t}),
+    onError:m=>LOG.push({k:'err',s:m})
+  });
+  window.T0=performance.now();
+  return (performance.now()-t0)/1000;
+};
+</script>
